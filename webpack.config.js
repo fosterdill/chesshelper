@@ -24,7 +24,9 @@ module.exports = {
     extensions: ['.js', '.jsx'],
     alias: {
       'c': path.resolve(__dirname, 'src/components/'),
-      'f': path.resolve(__dirname, 'src/features/'),
+      's': path.resolve(__dirname, 'src/slices/'),
+      'f': path.resolve(__dirname, 'src/fetches/'),
+      'u': path.resolve(__dirname, 'src/utils/'),
     },
   },
   plugins: [
