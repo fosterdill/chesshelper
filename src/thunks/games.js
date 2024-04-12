@@ -1,5 +1,5 @@
 import loadNodes from '../load-nodes';
-import { changeFen } from '../slices/fenSlice';
+import { changeFen, goLastFen } from '../slices/fenSlice';
 import { START_FEN } from '../utils';
 import localForage from "localforage";
 import { Chess } from 'chess.js';
@@ -21,8 +21,12 @@ export const makeMove = (moveName) => {
       moveNameClean = moveName.indexOf('...') !== -1 ? moveName.slice(moveName.indexOf('...') + 4) : moveName.slice(moveName.indexOf('.') + 2);
     }
     chessObj.move(moveNameClean);
-    const { edges } = (await localForage.getItem(`fosterdill_${getState().fen.side}_${chessObj.fen()}`));
-    dispatch(changeFen({ fen: chessObj.fen(), edges }));
+    try {
+      const { edges } = (await localForage.getItem(`fosterdill_${getState().fen.side}_${chessObj.fen()}`));
+      dispatch(changeFen({ fen: chessObj.fen(), edges }));
+    } catch (e) {
+      dispatch(changeFen({ fen: chessObj.fen(), edges: {} }));
+    }
   }
 }
 
@@ -30,5 +34,17 @@ export const changeSide = (newSide) => {
   return async (dispatch, getState) => {
     const { edges } = await localForage.getItem(`fosterdill_${newSide}_${START_FEN}`);
     dispatch(changeFen({ fen: START_FEN, edges, newSide }));
+  }
+}
+
+export const goBack = () => {
+  return async (dispatch, getState) => {
+    const previousFens = getState().fen.previousFens;
+    try {
+      const { edges } = await localForage.getItem(`fosterdill_${getState().fen.side}_${previousFens[previousFens.length - 1]}`);
+      dispatch(goLastFen(edges));
+    } catch (e) {
+      dispatch(goLastFen({}));
+    }
   }
 }
