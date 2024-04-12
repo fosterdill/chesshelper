@@ -16,7 +16,10 @@ export const fetchAllGames = (username) => {
 export const makeMove = (moveName) => {
   return async (dispatch, getState) => {
     const chessObj = new Chess(getState().fen.currentFen);
-    const moveNameClean = moveName.indexOf('...') !== -1 ? moveName.slice(5) : moveName.slice(3);
+    let moveNameClean = moveName;
+    if (moveNameClean.indexOf('.') !== -1) {
+      moveNameClean = moveName.indexOf('...') !== -1 ? moveName.slice(5) : moveName.slice(3);
+    }
     chessObj.move(moveNameClean);
     const { edges } = (await localForage.getItem(`fosterdill_white_${chessObj.fen()}`));
     dispatch(changeFen({ fen: chessObj.fen(), edges }));
