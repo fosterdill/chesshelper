@@ -8,10 +8,7 @@ export default async (username) => {
   );
 
   if (lastUpdatedDate) {
-    const whiteNodes = await localForage.getItem(`${username}_nodes_white`);
-    const blackNodes = await localForage.getItem(`${username}_nodes_black`);
-
-    return Promise.resolve({ whiteNodes, blackNodes });
+    return Promise.resolve();
   } else {
     const games = await fetchAllGames(username);
 
@@ -21,15 +18,19 @@ export default async (username) => {
       );
 
       worker.postMessage({ username, games });
-      worker.onmessage = ({ data: { whiteNodes, blackNodes } }) => {
-        localForage.setItem(`${username}_nodes_black`, blackNodes);
-        localForage.setItem(`${username}_nodes_white`, whiteNodes);
+      worker.onmessage = async ({ data: { whiteNodes, blackNodes } }) => {
+        for (const [key, value] of Object.entries(whiteNodes)) {
+          await localForage.setItem(`${username}_white_${key}`, value);
+        }
+        for (const [key, value] of Object.entries(blackNodes)) {
+          await localForage.setItem(`${username}_black_${key}`, value);
+        }
         localForage.setItem(
           `${username}_lastUpdatedDate`,
           new Date().toString()
         );
 
-        resolve({ whiteNodes, blackNodes });
+        resolve();
       };
     });
   }

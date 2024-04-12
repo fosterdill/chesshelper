@@ -1,5 +1,6 @@
 import { START_FEN, getMoveName } from "../utils";
 import { addEdge, createNode } from "../graph";
+import omit from 'lodash/omit';
 const { Chess } = require('chess.js');
 
 const addGame = (game, nodes, username, color) => {
@@ -42,6 +43,14 @@ const addGame = (game, nodes, username, color) => {
 const addAllGamesForColor = (games, nodes, username, color) => {
   for (let [index, game] of games.entries()) {
     addGame(game, nodes, username, color);
+  }
+
+  // removes the deeply nested from and to objects, which reference other nodes
+  // and are used for building the initial graph
+  for (const [key, value] of Object.entries(nodes)) {
+    Object.keys(value.edges).forEach((moveName) => {
+      value.edges[moveName] = omit(value.edges[moveName], ['from', 'to']);
+    })
   }
 };
 

@@ -1,7 +1,6 @@
-export const createNode = (name, data = {}) => {
+export const createNode = (name) => {
   return {
     name,
-    data,
     edges: {},
   };
 };

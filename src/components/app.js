@@ -1,20 +1,28 @@
 import { useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
-import { increment } from 's/counterSlice'
 import loadNodes from '../load-nodes';
+import { START_FEN } from '../utils';
+import { fetchAllGames, makeMove } from '../thunks/games';
 
 export default function App () {
-  // const count = useSelector((state) => state.counter.value)
-  // const dispatch = useDispatch()
+  const edges = useSelector((state) => state.fen.edges)
+  const dispatch = useDispatch()
   // const handleClick = useCallback(() => {
   //   dispatch(increment());
   // }, []);
-  useEffect(async () => {
-    const allNodes = await loadNodes(window.location.hash.slice(1));
-		const whiteNodes = allNodes.whiteNodes;
-		const blackNodes = allNodes.blackNodes;
-    console.log(allNodes);
-  })
+  useEffect(() => {
+    dispatch(fetchAllGames(window.location.hash.slice(1)));
+  }, []);
 
-  return <div>hi</div>;
+  const handleClick = useCallback((moveName) => {
+    dispatch(makeMove(moveName));
+  }, []);
+
+  return (
+    <ul>
+      {Object.keys(edges).map((edge) => (
+        <li onClick={() => handleClick(edge)}>{edge}</li>
+      ))}
+    </ul>
+  );
 };
