@@ -8,7 +8,7 @@ export const fetchAllGames = (username) => {
   return async (dispatch, getState) => {
     const username = window.location.hash.slice(1);
     await loadNodes(username);
-    const { edges } = (await localForage.getItem(`${username}_white_${START_FEN}`));
+    const { edges } = (await localForage.getItem(`${username}_${getState().fen.side}_${START_FEN}`));
     dispatch(changeFen({ fen: START_FEN, edges }));
   }
 }
@@ -18,10 +18,17 @@ export const makeMove = (moveName) => {
     const chessObj = new Chess(getState().fen.currentFen);
     let moveNameClean = moveName;
     if (moveNameClean.indexOf('.') !== -1) {
-      moveNameClean = moveName.indexOf('...') !== -1 ? moveName.slice(5) : moveName.slice(3);
+      moveNameClean = moveName.indexOf('...') !== -1 ? moveName.slice(moveName.indexOf('...') + 4) : moveName.slice(moveName.indexOf('.') + 2);
     }
     chessObj.move(moveNameClean);
-    const { edges } = (await localForage.getItem(`fosterdill_white_${chessObj.fen()}`));
+    const { edges } = (await localForage.getItem(`fosterdill_${getState().fen.side}_${chessObj.fen()}`));
     dispatch(changeFen({ fen: chessObj.fen(), edges }));
+  }
+}
+
+export const changeSide = (newSide) => {
+  return async (dispatch, getState) => {
+    const { edges } = await localForage.getItem(`fosterdill_${newSide}_${START_FEN}`);
+    dispatch(changeFen({ fen: START_FEN, edges, newSide }));
   }
 }
