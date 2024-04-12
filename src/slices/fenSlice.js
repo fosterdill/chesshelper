@@ -6,11 +6,13 @@ export const fenSlice = createSlice({
   initialState: {
     currentFen: START_FEN,
     edges: {},
+    side: 'white',
   },
   reducers: {
     changeFen: (state, action) => {
-      state.currentFen = action.payload.fen;
-      state.edges = action.payload.edges;
+      state.currentFen = action.payload.fen || state.currentFen;
+      state.edges = action.payload.edges || state.edges;
+      state.side = action.payload.newSide || state.side;
     },
   },
 })

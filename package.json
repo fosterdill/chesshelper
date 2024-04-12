@@ -20,6 +20,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
     "chess.js": "^1.0.0-beta.8",
+    "chessboardjsx": "^2.4.7",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
